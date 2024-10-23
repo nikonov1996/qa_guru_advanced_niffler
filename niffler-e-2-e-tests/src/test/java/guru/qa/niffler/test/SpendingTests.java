@@ -4,6 +4,9 @@ import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.jupiter.Spend;
+import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.SpendJson;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +21,14 @@ public class SpendingTests {
     static {
 //        System.setProperty("webdriver.chrome.driver", "/Users/qanva/Desktop/driver/chromedriver");
         WebDriverManager.chromedriver().setup();
+
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox", "--ignore-certificate-errors");
+        Configuration.webdriverLogsEnabled = false;
         Configuration.browser = "chrome";
         Configuration.headless = false;
         Configuration.browserSize = "1920x1080";
+        Configuration.pageLoadStrategy = "eager";
     }
 
     @BeforeEach
@@ -33,11 +39,18 @@ public class SpendingTests {
         $(".form__submit").click();
     }
 
+    @Spend(
+            username = "qanva",
+            description = "Test",
+            category = "TestCategory",
+            amount = 10000.00,
+            currency = CurrencyValues.RUB
+    )
     @Test
-    void deletedSpendingAfterDeleteActions() {
+    void deletedSpendingAfterDeleteActions(SpendJson spendJson) {
         $(".MuiTableBody-root")
                 .$$("tr")
-                .find(text("Test"))
+                .find(text(spendJson.description()))
                 .$$("td")
                 .first()
                 .click();
