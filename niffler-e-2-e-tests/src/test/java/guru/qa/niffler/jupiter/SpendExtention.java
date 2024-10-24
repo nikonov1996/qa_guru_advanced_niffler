@@ -10,7 +10,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.Date;
 
-public class SpendExtention implements BeforeEachCallback, ParameterResolver {
+public class SpendExtention implements BeforeEachCallback {
 
     public static ExtensionContext.Namespace NAMESPASE = ExtensionContext.Namespace.create(SpendExtention.class);
 
@@ -42,15 +42,5 @@ public class SpendExtention implements BeforeEachCallback, ParameterResolver {
             SpendJson createdSpend = spendService.addSpend(spendJson).execute().body();
             context.getStore(NAMESPASE).put("spend",createdSpend);
         }
-    }
-
-    @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class);
-    }
-
-    @Override
-    public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return extensionContext.getStore(NAMESPASE).get("spend", SpendJson.class);
     }
 }
