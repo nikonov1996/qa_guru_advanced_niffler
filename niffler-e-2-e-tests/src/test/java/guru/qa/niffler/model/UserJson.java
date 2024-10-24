@@ -2,7 +2,12 @@ package guru.qa.niffler.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import guru.qa.niffler.jupiter.User;
 import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.beans.Transient;
 import java.nio.charset.StandardCharsets;
@@ -10,26 +15,29 @@ import java.util.UUID;
 
 @Builder
 public record UserJson(
-    @JsonProperty("id")
+        @JsonProperty("id")
     UUID id,
-    @JsonProperty("username")
+        @JsonProperty("username")
     String username,
-    @JsonProperty("firstname")
+        @JsonProperty("firstname")
     String firstname,
-    @JsonProperty("surname")
+        @JsonProperty("surname")
     String surname,
-    @JsonProperty("fullname")
+        @JsonProperty("fullname")
     String fullname,
-    @JsonProperty("currency")
+        @JsonProperty("currency")
     CurrencyValues currency,
-    @JsonProperty("photo")
+        @JsonProperty("photo")
     String photo,
-    @JsonProperty("photoSmall")
+        @JsonProperty("photoSmall")
     String photoSmall,
-    @JsonProperty("friendState")
+        @JsonProperty("friendState")
     FriendState friendState,
-    @Transient
-    String password
-) {}
+        @Transient
+    String password,
+        @Transient
+        User.UserType userType
+) {
+}
 
   

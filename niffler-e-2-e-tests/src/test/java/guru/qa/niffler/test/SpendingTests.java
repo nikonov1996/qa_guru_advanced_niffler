@@ -12,6 +12,7 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.Allure;
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -19,25 +20,14 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.jupiter.User.UserType.WITH_FRIENDS;
+import static guru.qa.niffler.jupiter.User.UserType.WITHOUT_FRIENDS;
 
 public class SpendingTests extends BaseWebTest{
 
-    static {
-//        System.setProperty("webdriver.chrome.driver", "/Users/qanva/Desktop/driver/chromedriver");
-        WebDriverManager.chromedriver().setup();
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox", "--ignore-certificate-errors");
-        Configuration.webdriverLogsEnabled = false;
-        Configuration.browser = "chrome";
-        Configuration.headless = false;
-        Configuration.browserSize = "1920x1080";
-        Configuration.pageLoadStrategy = "eager";
-    }
 
     @BeforeEach
-    void doLogin(@User(type = WITH_FRIENDS) UserJson userJson) {
+    void doLogin(@User(userType = WITHOUT_FRIENDS) UserJson userJson) {
         Allure.step("Open base url",()->{
             Selenide.open("http://127.0.0.1:3000/");
         });
@@ -57,7 +47,7 @@ public class SpendingTests extends BaseWebTest{
             currency = CurrencyValues.RUB
     )
     @Test
-    void deletedSpendingAfterDeleteActions(SpendJson spendJson) {
+    void deletedSpendingAfterDeleteActions(@User(userType = WITHOUT_FRIENDS) UserJson userJson, SpendJson spendJson) {
         Allure.step("Click to delete spend",()->{
             $(".MuiTableBody-root")
                     .$$("tr")

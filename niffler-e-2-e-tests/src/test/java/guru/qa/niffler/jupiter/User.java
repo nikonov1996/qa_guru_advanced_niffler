@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 @ExtendWith(UserQueueExtension.class)
 public @interface User {
 
-    UserType type();
+    UserType userType();
     enum UserType{
-        WITH_FRIENDS, INVITATION_SENT, INVITATION_RECEIVED
+        WITHOUT_FRIENDS, WITH_FRIENDS, INVITATION_SENT, INVITATION_RECEIVED
     }
 }
