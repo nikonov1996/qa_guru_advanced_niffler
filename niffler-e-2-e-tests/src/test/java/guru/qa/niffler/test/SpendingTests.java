@@ -5,9 +5,11 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.Spend;
+import guru.qa.niffler.jupiter.WebTest;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.Allure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -16,7 +18,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
-public class SpendingTests {
+public class SpendingTests extends BaseWebTest{
 
     static {
 //        System.setProperty("webdriver.chrome.driver", "/Users/qanva/Desktop/driver/chromedriver");
@@ -33,10 +35,15 @@ public class SpendingTests {
 
     @BeforeEach
     void doLogin() {
-        Selenide.open("http://127.0.0.1:3000/");
-        $("input[name='username']").setValue("qanva");
-        $("input[name='password']").setValue("123");
-        $(".form__submit").click();
+        Allure.step("Open base url",()->{
+            Selenide.open("http://127.0.0.1:3000/");
+        });
+        Allure.step("Login",()->{
+            $("input[name='username']").setValue("qanva");
+            $("input[name='password']").setValue("123");
+            $(".form__submit").click();
+        });
+
     }
 
     @Spend(
@@ -48,18 +55,25 @@ public class SpendingTests {
     )
     @Test
     void deletedSpendingAfterDeleteActions(SpendJson spendJson) {
-        $(".MuiTableBody-root")
-                .$$("tr")
-                .find(text(spendJson.description()))
-                .$$("td")
-                .first()
-                .click();
+        Allure.step("Click to delete spend",()->{
+            $(".MuiTableBody-root")
+                    .$$("tr")
+                    .find(text(spendJson.description()))
+                    .$$("td")
+                    .first()
+                    .click();
+            $("#delete").click();
+        });
+        Allure.step("Approve deleting in modal window",()->{
+            $(".MuiDialog-paperScrollPaper")
+                    .shouldBe(Condition.visible)
+                    .$(byText("Delete")).click();
+        });
+        Allure.step("Check that spend deleted",()->{
+            $(".MuiTableBody-root")
+                    .$$("tr")
+                    .shouldHave(CollectionCondition.size(0));
+        });
 
-        $("#delete").click();
-        $(".MuiDialog-paperScrollPaper")
-                .shouldBe(Condition.visible)
-                .$(byText("Delete")).click();
-        $(".MuiTableBody-root")
-                .$$("tr").shouldHave(CollectionCondition.size(0));
     }
 }
