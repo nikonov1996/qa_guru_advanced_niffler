@@ -43,46 +43,36 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
 
-        List<Parameter> parameters = new ArrayList<>();
-        List<Parameter> testParams = Arrays.stream(context.getRequiredTestMethod().getParameters()).toList();
-        var classVal = context.getRequiredTestClass();
         var beforEach = Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(BeforeEach.class)).toList();
-        List<Parameter> beforEachParams = (!beforEach.isEmpty())?Arrays.stream(beforEach.getFirst().getParameters()).toList():Collections.emptyList();
 
-        if (testParams.isEmpty() ||
-                testParams.stream().filter(parameter -> parameter.isAnnotationPresent(User.class)).toList().isEmpty()){
-            if (!beforEachParams.isEmpty() &&
-            !beforEachParams.stream().filter(parameter -> parameter.isAnnotationPresent(User.class)).toList().isEmpty()){
-                parameters.addAll(beforEachParams);
-            }
-        } else parameters = testParams;
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.addAll(Arrays.stream(context.getRequiredTestMethod().getParameters()).toList());
+        parameters.addAll(Arrays.stream(beforEach.getFirst().getParameters()).toList());
 
-
+        Map<User.UserType, UserJson> userJsonMap = new ConcurrentHashMap<>();
         for (Parameter parameter : parameters) {
-
             User user = parameter.getAnnotation(User.class);
             if (user != null) {
                 UserJson candidate = null;
                 while (candidate == null) {
                     candidate = usersQueue.get(user.userType()).poll();
                 }
-                context.getStore(NAMESPASE).put(
-                        context.getUniqueId(), UserJson.builder()
-                                .username(candidate.username())
-                                .password(candidate.password())
-                                .userType(user.userType())
-                                .build());
-                break;
+                userJsonMap.put(user.userType(), UserJson.builder()
+                        .username(candidate.username())
+                        .password(candidate.password())
+                        .userType(user.userType())
+                        .build());
             }
         }
+        context.getStore(NAMESPASE).put(context.getUniqueId(), userJsonMap);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        UserJson usedUser = context.getStore(NAMESPASE).get(context.getUniqueId(), UserJson.class);
-        usersQueue.get(usedUser.userType()).add(usedUser);
-
+        Map<User.UserType, UserJson> usedUsers = (Map<User.UserType, UserJson>) context.getStore(NAMESPASE).get(context.getUniqueId());
+        usedUsers.keySet().forEach(userType -> usersQueue.get(userType).add(usedUsers.get(userType)));
     }
 
     @Override
@@ -91,9 +81,12 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
                 parameterContext.getParameter().isAnnotationPresent(User.class);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return extensionContext.getStore(NAMESPASE).get(extensionContext.getUniqueId(), UserJson.class);
+        User.UserType currentUserJsonType = parameterContext.getParameter().getAnnotation(User.class).userType();
+        Map<User.UserType, UserJson> usedUsers = (Map<User.UserType, UserJson>) extensionContext.getStore(NAMESPASE).get(extensionContext.getUniqueId());
+        return usedUsers.get(currentUserJsonType);
     }
 
 }
