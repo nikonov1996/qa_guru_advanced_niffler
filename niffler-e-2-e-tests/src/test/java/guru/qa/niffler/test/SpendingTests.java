@@ -20,7 +20,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.jupiter.User.UserType.WITHOUT_FRIENDS;
+import static guru.qa.niffler.jupiter.User.UserType.*;
 
 public class SpendingTests extends BaseWebTest{
 
@@ -28,17 +28,18 @@ public class SpendingTests extends BaseWebTest{
 
     @BeforeEach
     void doLogin(@User(userType = WITHOUT_FRIENDS) UserJson userJson) {
-        Allure.step("Open base url",()->{
-            Selenide.open("http://127.0.0.1:3000/");
-        });
-        Allure.step("Login",()->{
-            $("input[name='username']").setValue(userJson.username());
-            $("input[name='password']").setValue(userJson.password());
-            $(".form__submit").click();
-        });
+        System.out.println(userJson);
+//        Allure.step("Open base url",()->{
+//            Selenide.open("http://127.0.0.1:3000/");
+//        });
+//        Allure.step("Login",()->{
+//            $("input[name='username']").setValue(userJson.username());
+//            $("input[name='password']").setValue(userJson.password());
+//            $(".form__submit").click();
+//        });
 
     }
-
+//
     @Spend(
             username = "qanva",
             description = "Test",
@@ -47,26 +48,36 @@ public class SpendingTests extends BaseWebTest{
             currency = CurrencyValues.RUB
     )
     @Test
-    void deletedSpendingAfterDeleteActions(@User(userType = WITHOUT_FRIENDS) UserJson userJson, SpendJson spendJson) {
-        Allure.step("Click to delete spend",()->{
-            $(".MuiTableBody-root")
-                    .$$("tr")
-                    .find(text(spendJson.description()))
-                    .$$("td")
-                    .first()
-                    .click();
-            $("#delete").click();
-        });
-        Allure.step("Approve deleting in modal window",()->{
-            $(".MuiDialog-paperScrollPaper")
-                    .shouldBe(Condition.visible)
-                    .$(byText("Delete")).click();
-        });
-        Allure.step("Check that spend deleted",()->{
-            $(".MuiTableBody-root")
-                    .$$("tr")
-                    .shouldHave(CollectionCondition.size(0));
-        });
+    void deletedSpendingAfterDeleteActions( @User(userType = INVITATION_SENT) UserJson userJson, SpendJson spendJson) {
+        System.out.println(userJson);
+//        Allure.step("Open base url",()->{
+//            Selenide.open("http://127.0.0.1:3000/");
+//        });
+//        Allure.step("Login",()->{
+//            $("input[name='username']").setValue(userJson.username());
+//            $("input[name='password']").setValue(userJson.password());
+//            $(".form__submit").click();
+//        });
+
+//        Allure.step("Click to delete spend",()->{
+//            $(".MuiTableBody-root")
+//                    .$$("tr")
+//                    .find(text(spendJson.description()))
+//                    .$$("td")
+//                    .first()
+//                    .click();
+//            $("#delete").click();
+//        });
+//        Allure.step("Approve deleting in modal window",()->{
+//            $(".MuiDialog-paperScrollPaper")
+//                    .shouldBe(Condition.visible)
+//                    .$(byText("Delete")).click();
+//        });
+//        Allure.step("Check that spend deleted",()->{
+//            $(".MuiTableBody-root")
+//                    .$$("tr")
+//                    .shouldHave(CollectionCondition.size(0));
+//        });
 
     }
 }

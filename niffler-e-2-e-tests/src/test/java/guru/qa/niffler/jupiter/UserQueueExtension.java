@@ -2,14 +2,15 @@ package guru.qa.niffler.jupiter;
 
 import guru.qa.niffler.model.UserJson;
 import io.qameta.allure.AllureId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
@@ -37,26 +38,41 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
         usersQueue.put(User.UserType.INVITATION_RECEIVED, withInvitesUsersQueue);
         usersQueue.put(User.UserType.INVITATION_SENT, sentInviteUsersQueue);
         usersQueue.put(User.UserType.WITHOUT_FRIENDS, withoutFriendsUsersQueue);
-
     }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        Parameter[] parameters = context.getRequiredTestMethod().getParameters();
+
+        List<Parameter> parameters = new ArrayList<>();
+        List<Parameter> testParams = Arrays.stream(context.getRequiredTestMethod().getParameters()).toList();
+        var classVal = context.getRequiredTestClass();
+        var beforEach = Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(BeforeEach.class)).toList();
+        List<Parameter> beforEachParams = (!beforEach.isEmpty())?Arrays.stream(beforEach.getFirst().getParameters()).toList():Collections.emptyList();
+
+        if (testParams.isEmpty() ||
+                testParams.stream().filter(parameter -> parameter.isAnnotationPresent(User.class)).toList().isEmpty()){
+            if (!beforEachParams.isEmpty() &&
+            !beforEachParams.stream().filter(parameter -> parameter.isAnnotationPresent(User.class)).toList().isEmpty()){
+                parameters.addAll(beforEachParams);
+            }
+        } else parameters = testParams;
+
+
         for (Parameter parameter : parameters) {
-            if (parameter.getType().isAssignableFrom(UserJson.class)) {
-                User paramAnnotation = parameter.getAnnotation(User.class);
-                User.UserType type = paramAnnotation.userType();
-                Queue<UserJson> usersQueueByType = usersQueue.get(type);
+
+            User user = parameter.getAnnotation(User.class);
+            if (user != null) {
                 UserJson candidate = null;
                 while (candidate == null) {
-                    candidate = usersQueueByType.poll();
+                    candidate = usersQueue.get(user.userType()).poll();
                 }
-                context.getStore(NAMESPASE).put(context.getUniqueId(),
-                        UserJson.builder()
+                context.getStore(NAMESPASE).put(
+                        context.getUniqueId(), UserJson.builder()
                                 .username(candidate.username())
                                 .password(candidate.password())
-                                .userType(type).build());
+                                .userType(user.userType())
+                                .build());
                 break;
             }
         }
@@ -66,24 +82,18 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
     public void afterTestExecution(ExtensionContext context) throws Exception {
         UserJson usedUser = context.getStore(NAMESPASE).get(context.getUniqueId(), UserJson.class);
         usersQueue.get(usedUser.userType()).add(usedUser);
+
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().isAssignableFrom(UserJson.class);
+        return parameterContext.getParameter().getType().isAssignableFrom(UserJson.class) &&
+                parameterContext.getParameter().isAnnotationPresent(User.class);
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return extensionContext.getStore(NAMESPASE).get(extensionContext.getUniqueId(),UserJson.class);
-    }
-
-    private String getAllureId(ExtensionContext extensionContext){
-        AllureId allureId = extensionContext.getRequiredTestMethod().getAnnotation(AllureId.class);
-        if (allureId == null){
-            throw new IllegalStateException("Annotation AllureId is not present");
-        }
-        return allureId.value();
+        return extensionContext.getStore(NAMESPASE).get(extensionContext.getUniqueId(), UserJson.class);
     }
 
 }
