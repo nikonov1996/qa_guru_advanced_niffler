@@ -3,6 +3,8 @@ package guru.qa.niffler.test;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.config.Config;
+import guru.qa.niffler.config.LocalConfig;
 import guru.qa.niffler.jupiter.Spend;
 import guru.qa.niffler.jupiter.User;
 import guru.qa.niffler.model.CurrencyValues;
