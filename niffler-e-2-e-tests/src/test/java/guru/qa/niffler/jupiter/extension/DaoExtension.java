@@ -1,7 +1,8 @@
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.db.dao.AuthUserDao;
 import guru.qa.niffler.db.dao.UserDataDao;
+import guru.qa.niffler.jupiter.annotation.Dao;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 

@@ -1,7 +1,7 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Configuration;
-import guru.qa.niffler.jupiter.WebTest;
+import guru.qa.niffler.jupiter.annotation.WebTest;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeOptions;
 

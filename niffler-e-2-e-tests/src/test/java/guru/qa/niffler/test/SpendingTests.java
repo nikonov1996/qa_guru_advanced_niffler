@@ -3,10 +3,8 @@ package guru.qa.niffler.test;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.config.LocalConfig;
-import guru.qa.niffler.jupiter.Spend;
-import guru.qa.niffler.jupiter.User;
+import guru.qa.niffler.jupiter.annotation.Spend;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
@@ -17,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.jupiter.User.UserType.*;
+import static guru.qa.niffler.jupiter.annotation.User.UserType.*;
 
 public class SpendingTests extends BaseWebTest {
 

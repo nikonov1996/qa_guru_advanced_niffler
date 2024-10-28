@@ -1,16 +1,10 @@
 package guru.qa.niffler.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import guru.qa.niffler.jupiter.User;
+import guru.qa.niffler.jupiter.annotation.User;
 import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.kafka.common.protocol.types.Field;
 
 import java.beans.Transient;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Builder

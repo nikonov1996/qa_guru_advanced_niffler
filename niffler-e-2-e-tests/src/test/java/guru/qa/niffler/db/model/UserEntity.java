@@ -17,6 +17,7 @@ import static jakarta.persistence.FetchType.EAGER;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserEntity implements Serializable {
 
   private UUID id;

@@ -1,4 +1,4 @@
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.model.SpendJson;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import static guru.qa.niffler.jupiter.SpendExtention.NAMESPASE;
+import static guru.qa.niffler.jupiter.extension.SpendExtention.NAMESPASE;
 
 public class SpendExtentionParameterResolver implements ParameterResolver {
     @Override

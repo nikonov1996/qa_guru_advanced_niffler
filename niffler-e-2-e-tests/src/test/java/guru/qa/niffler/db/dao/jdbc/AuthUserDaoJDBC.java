@@ -1,12 +1,11 @@
-package guru.qa.niffler.db.dao;
+package guru.qa.niffler.db.dao.jdbc;
 
 import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
+import guru.qa.niffler.db.dao.AuthUserDao;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthorityEntity;
-import guru.qa.niffler.db.model.UserDataEntity;
 import guru.qa.niffler.db.model.UserEntity;
-import guru.qa.niffler.model.CurrencyValues;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,10 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AuthUserDaoJDBC implements AuthUserDao, UserDataDao {
+public class AuthUserDaoJDBC implements AuthUserDao {
 
     private static DataSource authDataSource = DataSourceProvider.INSTANCE.getDataSource(DataSourceDB.AUTH);
-    private static DataSource userDataSource = DataSourceProvider.INSTANCE.getDataSource(DataSourceDB.USERDATA);
 
     @Override
     public void createUser(UserEntity user) {
@@ -74,51 +72,18 @@ public class AuthUserDaoJDBC implements AuthUserDao, UserDataDao {
     }
 
     @Override
-    public void createUserData(UserDataEntity user) {
-        try (Connection userDataConn = userDataSource.getConnection()) {
-            try (PreparedStatement userDataPrepared = userDataConn.prepareStatement(
-                    "INSERT INTO \"user\" (username, currency) " +
-                            "VALUES(?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            ) {
-                userDataPrepared.setString(1, user.getUsername());
-                userDataPrepared.setString(2, CurrencyValues.RUB.name());
-                userDataPrepared.executeUpdate();
-                UUID generatedUserId = null;
-                try (ResultSet generatedKeys = userDataPrepared.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        generatedUserId = UUID.fromString(generatedKeys.getString("id"));
-                    }
-                    user.setId(generatedUserId);
-                } catch (SQLException e) {
-                    throw new IllegalStateException("Can't take id from ResultSet");
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deleteUserDataById(UUID userId) {
-        try (Connection userDataConn = userDataSource.getConnection();
-             PreparedStatement deleteStatement = userDataConn.prepareStatement(
-                     "DELETE FROM \"user\"  WHERE \"id\" = ?"
-             )) {
-            deleteStatement.setString(1, String.valueOf(userId));
-            deleteStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void deleteUserById(UUID userId) {
         try (Connection authConn = authDataSource.getConnection();
-             PreparedStatement deleteStatement = authConn.prepareStatement(
+             PreparedStatement deleteAuthorityStatement = authConn.prepareStatement(
+                     "DELETE FROM \"authority\"  WHERE \"user_id\" = ?"
+             );
+             PreparedStatement deleteUserStatement = authConn.prepareStatement(
                      "DELETE FROM \"user\"  WHERE \"id\" = ?"
              )) {
-            deleteStatement.setString(1, String.valueOf(userId));
-            deleteStatement.executeUpdate();
+            deleteUserStatement.setObject(1, userId);
+            deleteAuthorityStatement.setObject(1, userId);
+            deleteAuthorityStatement.executeUpdate();
+            deleteUserStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -1,16 +1,14 @@
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.UserJson;
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
