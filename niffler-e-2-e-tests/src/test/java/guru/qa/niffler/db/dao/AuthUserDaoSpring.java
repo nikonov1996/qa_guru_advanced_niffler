@@ -12,4 +12,15 @@ public class AuthUserDaoSpring implements AuthUserDao{
     @Override
     public void deleteUserById(UUID userId) {
     }
+
+    @Override
+    public UserEntity getUserById(UUID userId) {
+
+        return null;
+    }
+
+    @Override
+    public UserEntity getUserByUsername(String username) {
+        return null;
+    }
 }

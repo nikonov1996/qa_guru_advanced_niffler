@@ -30,4 +30,7 @@ public interface AuthUserDao {
 
     void deleteUserById(UUID userId);
 
+    UserEntity getUserById(UUID userId);
+    UserEntity getUserByUsername(String username);
+
 }

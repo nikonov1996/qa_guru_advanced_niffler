@@ -1,9 +1,7 @@
 package guru.qa.niffler.db.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
@@ -17,6 +15,8 @@ import static jakarta.persistence.FetchType.EAGER;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity implements Serializable {
 
   private UUID id;

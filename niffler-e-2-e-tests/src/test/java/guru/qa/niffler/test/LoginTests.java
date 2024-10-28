@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import static com.codeborne.selenide.Selenide.$;
 
@@ -51,7 +52,6 @@ public class LoginTests extends BaseWebTest{
                 .username(user.getUsername()).build();
         userData.createUserData(userDataEntity);
 
-        System.out.println(user);
     }
 
     @AfterEach

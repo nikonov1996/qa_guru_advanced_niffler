@@ -3,6 +3,7 @@ package guru.qa.niffler.db.dao;
 import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.model.Authority;
+import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserDataEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
@@ -12,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthUserDaoJDBC implements AuthUserDao, UserDataDao {
@@ -72,7 +75,7 @@ public class AuthUserDaoJDBC implements AuthUserDao, UserDataDao {
 
     @Override
     public void createUserData(UserDataEntity user) {
-        try(Connection userDataConn = userDataSource.getConnection()){
+        try (Connection userDataConn = userDataSource.getConnection()) {
             try (PreparedStatement userDataPrepared = userDataConn.prepareStatement(
                     "INSERT INTO \"user\" (username, currency) " +
                             "VALUES(?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
@@ -97,11 +100,101 @@ public class AuthUserDaoJDBC implements AuthUserDao, UserDataDao {
 
     @Override
     public void deleteUserDataById(UUID userId) {
-
+        try (Connection userDataConn = userDataSource.getConnection();
+             PreparedStatement deleteStatement = userDataConn.prepareStatement(
+                     "DELETE FROM \"user\"  WHERE \"id\" = ?"
+             )) {
+            deleteStatement.setString(1, String.valueOf(userId));
+            deleteStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void deleteUserById(UUID userId) {
+        try (Connection authConn = authDataSource.getConnection();
+             PreparedStatement deleteStatement = authConn.prepareStatement(
+                     "DELETE FROM \"user\"  WHERE \"id\" = ?"
+             )) {
+            deleteStatement.setString(1, String.valueOf(userId));
+            deleteStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public UserEntity getUserById(UUID userId) {
+        try (
+                Connection authConn = authDataSource.getConnection();
+                PreparedStatement getUserStatement = authConn.prepareStatement(
+                        "SELECT username,password,enabled,account_non_expired,account_non_locked,credentials_non_expired," +
+                                "\"authority\".id AS authority_id,authority FROM \"user\" " +
+                                "JOIN \"authority\" ON \"user\".id=user_id " +
+                                "WHERE \"user\".id = ?")) {
+            getUserStatement.setObject(1, userId);
+            ResultSet resultSet = getUserStatement.executeQuery();
+            UserEntity userEntity = new UserEntity();
+            List<AuthorityEntity> authorities = new ArrayList<>();
+
+            while (resultSet.next()) {
+                if (userEntity.getUsername() == null) {
+                    userEntity.setId(userId);
+                    userEntity.setUsername(resultSet.getString("username"));
+                    userEntity.setPassword(resultSet.getString("password"));
+                    userEntity.setEnabled(resultSet.getBoolean("enabled"));
+                    userEntity.setAccountNonExpired(resultSet.getBoolean("account_non_expired"));
+                    userEntity.setAccountNonLocked(resultSet.getBoolean("account_non_locked"));
+                    userEntity.setCredentialsNonExpired(resultSet.getBoolean("credentials_non_expired"));
+                }
+                authorities.add(
+                        AuthorityEntity.builder()
+                                .id(UUID.fromString(resultSet.getString("authority_id")))
+                                .authority(Authority.valueOf(resultSet.getString("authority"))).build());
+            }
+            userEntity.setAuthorities(authorities);
+            return userEntity;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public UserEntity getUserByUsername(String username) {
+        try (
+                Connection authConn = authDataSource.getConnection();
+                PreparedStatement getUserStatement = authConn.prepareStatement(
+                        "SELECT \"user\".id,username,password,enabled,account_non_expired,account_non_locked,credentials_non_expired," +
+                                "\"authority\".id AS authority_id,authority FROM \"user\" " +
+                                "JOIN \"authority\" ON \"user\".id=user_id " +
+                                "WHERE \"user\".username = ?")) {
+            getUserStatement.setString(1, username);
+            ResultSet resultSet = getUserStatement.executeQuery();
+            UserEntity userEntity = new UserEntity();
+            List<AuthorityEntity> authorities = new ArrayList<>();
+
+            while (resultSet.next()) {
+                if (userEntity.getUsername() == null) {
+                    userEntity.setId(UUID.fromString(resultSet.getString("id")));
+                    userEntity.setUsername(resultSet.getString("username"));
+                    userEntity.setPassword(resultSet.getString("password"));
+                    userEntity.setEnabled(resultSet.getBoolean("enabled"));
+                    userEntity.setAccountNonExpired(resultSet.getBoolean("account_non_expired"));
+                    userEntity.setAccountNonLocked(resultSet.getBoolean("account_non_locked"));
+                    userEntity.setCredentialsNonExpired(resultSet.getBoolean("credentials_non_expired"));
+                }
+                authorities.add(
+                        AuthorityEntity.builder()
+                                .id(UUID.fromString(resultSet.getString("authority_id")))
+                                .authority(Authority.valueOf(resultSet.getString("authority"))).build());
+            }
+            userEntity.setAuthorities(authorities);
+            return userEntity;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
