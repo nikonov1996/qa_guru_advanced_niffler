@@ -1,6 +1,7 @@
 package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.dao.jdbc.AuthUserDaoJDBC;
+import guru.qa.niffler.db.dao.spring.AuthUserDaoSpring;
 import guru.qa.niffler.db.model.UserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +19,7 @@ public interface AuthUserDao {
      Следовательно, сам тест ничего не знает о том, с какой базой данных он работает. Это называется слабая связностью
   */
     static AuthUserDao getInstance() {
-        String dbImpl = "";//System.getProperty("db.impl");
+        String dbImpl = "spring";//System.getProperty("db.impl");
         return switch (dbImpl) {
             case "spring" -> new AuthUserDaoSpring();
             default -> new AuthUserDaoJDBC();

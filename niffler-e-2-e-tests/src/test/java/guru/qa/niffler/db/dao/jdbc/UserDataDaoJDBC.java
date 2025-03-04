@@ -16,6 +16,7 @@ import java.util.UUID;
 public class UserDataDaoJDBC implements UserDataDao {
 
     private static DataSource userDataSource = DataSourceProvider.INSTANCE.getDataSource(DataSourceDB.USERDATA);
+
     @Override
     public void createUserData(UserDataEntity user) {
         try (Connection userDataConn = userDataSource.getConnection()) {
