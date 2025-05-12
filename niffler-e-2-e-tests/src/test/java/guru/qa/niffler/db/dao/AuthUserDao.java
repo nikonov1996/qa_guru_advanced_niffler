@@ -1,8 +1,9 @@
 package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.dao.jdbc.AuthUserDaoJDBC;
+import guru.qa.niffler.db.dao.jpa.AuthUserDaoHibernate;
 import guru.qa.niffler.db.dao.spring.AuthUserDaoSpring;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.UserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,9 +20,10 @@ public interface AuthUserDao {
      Следовательно, сам тест ничего не знает о том, с какой базой данных он работает. Это называется слабая связностью
   */
     static AuthUserDao getInstance() {
-        String dbImpl = "spring";//System.getProperty("db.impl");
+        String dbImpl = "hibernate";//System.getProperty("db.impl");
         return switch (dbImpl) {
             case "spring" -> new AuthUserDaoSpring();
+            case "hibernate" -> new AuthUserDaoHibernate();
             default -> new AuthUserDaoJDBC();
         };
     }
@@ -30,7 +32,8 @@ public interface AuthUserDao {
 
     void createUser(UserEntity user); // модели которые мапятся на таблицу баззы данных имеют в названии слово Entity
 
-    void deleteUserById(UUID userId);
+    void deleteUser(guru.qa.niffler.db.model.jpa.UserEntity user);
+
 
     UserEntity getUserById(UUID userId);
     UserEntity getUserByUsername(String username);

@@ -4,8 +4,8 @@ import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.dao.AuthUserDao;
 import guru.qa.niffler.db.mapper.UserEntityRowMapper;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.Authority;
+import guru.qa.niffler.db.model.jpa.UserEntity;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,7 +16,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -72,9 +71,9 @@ public class AuthUserDaoSpring implements AuthUserDao {
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
-        authUserJdbcTemplate.update("DELETE FROM \"authority\"  WHERE \"user_id\" = ?", userId);
-        authUserJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", userId);
+    public void deleteUser(UserEntity user) {
+        authUserJdbcTemplate.update("DELETE FROM \"authority\"  WHERE \"user_id\" = ?", user.getId());
+        authUserJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", user.getId());
     }
 
     @Override

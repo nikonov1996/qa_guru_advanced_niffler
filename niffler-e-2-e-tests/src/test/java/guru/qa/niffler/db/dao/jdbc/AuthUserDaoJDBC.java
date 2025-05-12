@@ -3,9 +3,9 @@ package guru.qa.niffler.db.dao.jdbc;
 import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.dao.AuthUserDao;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.Authority;
+import guru.qa.niffler.db.model.jpa.AuthorityEntity;
+import guru.qa.niffler.db.model.jpa.UserEntity;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -72,7 +72,7 @@ public class AuthUserDaoJDBC implements AuthUserDao {
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
+    public void deleteUser(UserEntity user) {
         try (Connection authConn = authDataSource.getConnection();
              PreparedStatement deleteAuthorityStatement = authConn.prepareStatement(
                      "DELETE FROM \"authority\"  WHERE \"user_id\" = ?"
@@ -80,8 +80,8 @@ public class AuthUserDaoJDBC implements AuthUserDao {
              PreparedStatement deleteUserStatement = authConn.prepareStatement(
                      "DELETE FROM \"user\"  WHERE \"id\" = ?"
              )) {
-            deleteUserStatement.setObject(1, userId);
-            deleteAuthorityStatement.setObject(1, userId);
+            deleteUserStatement.setObject(1, user.getId());
+            deleteAuthorityStatement.setObject(1, user.getId());
             deleteAuthorityStatement.executeUpdate();
             deleteUserStatement.executeUpdate();
         } catch (SQLException e) {

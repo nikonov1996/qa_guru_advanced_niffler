@@ -1,23 +1,21 @@
 package guru.qa.niffler.db.dao;
 
-import guru.qa.niffler.db.dao.jdbc.AuthUserDaoJDBC;
 import guru.qa.niffler.db.dao.jdbc.UserDataDaoJDBC;
+import guru.qa.niffler.db.dao.jpa.UserDataDaoHibernate;
 import guru.qa.niffler.db.dao.spring.UserDataDaoSpring;
-import guru.qa.niffler.db.model.UserDataEntity;
-import guru.qa.niffler.db.model.UserEntity;
-
-import java.util.UUID;
+import guru.qa.niffler.db.model.jpa.UserDataEntity;
 
 public interface UserDataDao {
     static UserDataDao getInstance() {
-        String dbImpl = "";//System.getProperty("db.impl");
+        String dbImpl = "hibernate";//System.getProperty("db.impl");
         return switch (dbImpl) {
             case "spring" -> new UserDataDaoSpring();
+            case "hibernate" -> new UserDataDaoHibernate();
             default -> new UserDataDaoJDBC();
         };
     }
 
     void createUserData(UserDataEntity user);
 
-    void deleteUserDataById(UUID userId);
+    void deleteUser(UserDataEntity user);
 }

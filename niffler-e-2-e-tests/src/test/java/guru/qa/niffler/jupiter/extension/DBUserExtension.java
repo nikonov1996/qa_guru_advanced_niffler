@@ -2,13 +2,13 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.db.dao.AuthUserDao;
 import guru.qa.niffler.db.dao.UserDataDao;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
-import guru.qa.niffler.db.model.UserDataEntity;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.Authority;
+import guru.qa.niffler.db.model.jpa.AuthorityEntity;
+import guru.qa.niffler.db.model.jpa.UserDataEntity;
+import guru.qa.niffler.db.model.jpa.UserEntity;
+import guru.qa.niffler.grpc.CurrencyValues;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.jupiter.annotation.Entity;
-import guru.qa.niffler.model.CurrencyValues;
 import org.junit.jupiter.api.extension.*;
 
 import java.util.Arrays;
@@ -19,31 +19,32 @@ public class DBUserExtension implements ParameterResolver, BeforeEachCallback, A
     private static AuthUserDao authUserDao = AuthUserDao.getInstance();
     private static UserDataDao userDataDao = UserDataDao.getInstance();
 
-    private static UserEntity userEntity;
-    private static UserDataEntity userDataEntity;
+    private static UserEntity userEntity = new UserEntity();
+    private static UserDataEntity userDataEntity = new UserDataEntity();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         if (context.getRequiredTestMethod().isAnnotationPresent(DBUser.class)) {
             DBUser dbUser = context.getRequiredTestMethod().getAnnotation(DBUser.class);
-            userEntity = UserEntity.builder()
-                    .username(dbUser.username())
-                    .password(dbUser.password())
-                    .enabled(dbUser.enabled())
-                    .accountNonLocked(dbUser.accountNonLocked())
-                    .credentialsNonExpired(dbUser.credentialsNonExpired())
-                    .accountNonExpired(dbUser.accountNonExpired())
-                    .authorities(
+
+            userEntity.setUsername(dbUser.username());
+            userEntity.setPassword(dbUser.password());
+            userEntity.setEnabled(dbUser.enabled());
+            userEntity.setAccountNonLocked(dbUser.accountNonLocked());
+            userEntity.setCredentialsNonExpired(dbUser.credentialsNonExpired());
+            userEntity.setAccountNonExpired(dbUser.accountNonExpired());
+            userEntity.setAuthorities(
                             Arrays.stream(Authority.values())
-                                    .map(authority -> AuthorityEntity.builder()
-                                            .authority(authority)
-                                            .build())
-                                    .toList())
-                    .build();
-            userDataEntity = UserDataEntity.builder()
-                    .username(dbUser.username())
-                    .currency(CurrencyValues.RUB)
-                    .build();
+                                    .map(authority -> {
+                                        AuthorityEntity authorityEntity = new AuthorityEntity();
+                                                authorityEntity.setAuthority(authority);
+                                                authorityEntity.setUser(userEntity);
+                                                return authorityEntity;
+                                    })
+                                    .toList());
+            userDataEntity.setUsername(dbUser.username());
+            userDataEntity.setCurrency(CurrencyValues.RUB);
+
             authUserDao.createUser(userEntity);
             userDataDao.createUserData(userDataEntity);
             context.getStore(DB_USERS_NAMESPACE).put(context.getUniqueId(),userEntity);
@@ -52,8 +53,8 @@ public class DBUserExtension implements ParameterResolver, BeforeEachCallback, A
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
-        userDataDao.deleteUserDataById(userDataEntity.getId());
-        authUserDao.deleteUserById(userEntity.getId());
+        userDataDao.deleteUser(userDataEntity);
+        authUserDao.deleteUser(userEntity);
         context.getStore(DB_USERS_NAMESPACE).remove(context.getUniqueId());
     }
 

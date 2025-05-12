@@ -1,6 +1,6 @@
 package guru.qa.niffler.db.mapper;
 
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.UserEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

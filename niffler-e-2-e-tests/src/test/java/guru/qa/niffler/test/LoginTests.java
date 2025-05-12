@@ -1,7 +1,7 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.jpa.UserEntity;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.jupiter.annotation.Entity;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import static io.qameta.allure.Allure.step;
 public class LoginTests extends BaseWebTest {
 
     @DBUser(
-            username = "babaca",
+            username = "babaca222",
             password = "123",
             enabled = true,
             accountNonLocked = true,

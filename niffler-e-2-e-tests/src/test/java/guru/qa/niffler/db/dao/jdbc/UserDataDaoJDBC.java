@@ -3,7 +3,7 @@ package guru.qa.niffler.db.dao.jdbc;
 import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.dao.UserDataDao;
-import guru.qa.niffler.db.model.UserDataEntity;
+import guru.qa.niffler.db.model.jpa.UserDataEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
 import javax.sql.DataSource;
@@ -43,12 +43,12 @@ public class UserDataDaoJDBC implements UserDataDao {
     }
 
     @Override
-    public void deleteUserDataById(UUID userId) {
+    public void deleteUser(UserDataEntity user) {
         try (Connection userDataConn = userDataSource.getConnection();
              PreparedStatement deleteStatement = userDataConn.prepareStatement(
                      "DELETE FROM \"user\"  WHERE \"id\" = ?"
              )) {
-            deleteStatement.setObject(1, userId);
+            deleteStatement.setObject(1, user.getId());
             deleteStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

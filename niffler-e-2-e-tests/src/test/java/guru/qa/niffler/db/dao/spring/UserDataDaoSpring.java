@@ -3,16 +3,14 @@ package guru.qa.niffler.db.dao.spring;
 import guru.qa.niffler.db.DataSourceDB;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.dao.UserDataDao;
-import guru.qa.niffler.db.model.UserDataEntity;
+import guru.qa.niffler.db.model.jpa.UserDataEntity;
 import guru.qa.niffler.model.CurrencyValues;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Objects;
@@ -50,7 +48,7 @@ public class UserDataDaoSpring implements UserDataDao {
     }
 
     @Override
-    public void deleteUserDataById(UUID userId) {
-        userDataJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", userId);
+    public void deleteUser(UserDataEntity user) {
+        userDataJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", user.getId());
     }
 }
