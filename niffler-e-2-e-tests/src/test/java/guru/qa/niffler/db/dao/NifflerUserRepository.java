@@ -16,7 +16,7 @@ public class NifflerUserRepository {
 
     public void removeUser(UserEntity user){
         authUserDao.deleteUser(user);
-        userDataDao.getUserDataByUsername(fromAuthUser(user));
+        userDataDao.deleteUser(fromAuthUser(user));
     }
 
 

@@ -51,7 +51,7 @@ public class UserDataDaoSpring implements UserDataDao {
 
     @Override
     public void deleteUser(UserDataEntity user) {
-        userDataJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", user.getId());
+        userDataJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"username\" = ?", user.getUsername());
     }
 
     @Override

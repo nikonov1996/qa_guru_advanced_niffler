@@ -46,9 +46,9 @@ public class UserDataDaoJDBC implements UserDataDao {
     public void deleteUser(UserDataEntity user) {
         try (Connection userDataConn = userDataSource.getConnection();
              PreparedStatement deleteStatement = userDataConn.prepareStatement(
-                     "DELETE FROM \"user\"  WHERE \"id\" = ?"
+                     "DELETE FROM \"user\"  WHERE \"username\" = ?"
              )) {
-            deleteStatement.setObject(1, user.getId());
+            deleteStatement.setObject(1, user.getUsername());
             deleteStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
