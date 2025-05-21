@@ -13,7 +13,7 @@ import static io.qameta.allure.Allure.step;
 public class LoginTests extends BaseWebTest {
 
     @DBUser(
-            username = "babaca222",
+            username = "babaca2",
             password = "123",
             enabled = true,
             accountNonLocked = true,

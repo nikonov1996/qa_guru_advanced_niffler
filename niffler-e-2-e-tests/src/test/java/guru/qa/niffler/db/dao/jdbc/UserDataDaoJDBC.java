@@ -54,4 +54,24 @@ public class UserDataDaoJDBC implements UserDataDao {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public UserDataEntity getUserDataByUsername(UserDataEntity user) {
+        UserDataEntity userData = new UserDataEntity();
+        try(Connection userDataConn = userDataSource.getConnection();
+        PreparedStatement getUserDataStatement = userDataConn.prepareStatement(
+                "SELECT * FROM \"user\" WHERE \"username\" = ?")) {
+            getUserDataStatement.setObject(1, user.getUsername());
+            getUserDataStatement.execute();
+            ResultSet resultSet = getUserDataStatement.getResultSet();
+            if (resultSet.next()){
+                userData.setId(resultSet.getObject("id", UUID.class));
+                userData.setUsername(resultSet.getString("username"));
+                userData.setCurrency(CurrencyValues.valueOf(resultSet.getString("currency")));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userData;
+    }
 }

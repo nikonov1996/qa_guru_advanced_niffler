@@ -18,4 +18,6 @@ public interface UserDataDao {
     void createUserData(UserDataEntity user);
 
     void deleteUser(UserDataEntity user);
+
+    UserDataEntity getUserDataByUsername(UserDataEntity user);
 }

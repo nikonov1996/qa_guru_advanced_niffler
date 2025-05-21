@@ -16,6 +16,8 @@ import java.sql.Statement;
 import java.util.Objects;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 public class UserDataDaoSpring implements UserDataDao {
 
     private final TransactionTemplate userDataTtmpl;
@@ -50,5 +52,12 @@ public class UserDataDaoSpring implements UserDataDao {
     @Override
     public void deleteUser(UserDataEntity user) {
         userDataJdbcTemplate.update("DELETE FROM \"user\"  WHERE \"id\" = ?", user.getId());
+    }
+
+    @Override
+    public UserDataEntity getUserDataByUsername(UserDataEntity user) {
+        UserDataEntity userData = new UserDataEntity();
+        String selectSql = format("SELECT * FROM \"user\" WHERE \"id\" = %s", userData.getUsername());
+        return userDataJdbcTemplate.queryForObject(selectSql, UserDataEntity.class);
     }
 }

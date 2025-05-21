@@ -1,6 +1,6 @@
 package guru.qa.niffler.db.model.jpa;
 
-import guru.qa.niffler.grpc.CurrencyValues;
+import guru.qa.niffler.model.CurrencyValues;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

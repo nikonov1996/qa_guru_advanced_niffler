@@ -1,12 +1,9 @@
 package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.db.dao.AuthUserDao;
-import guru.qa.niffler.db.dao.UserDataDao;
+import guru.qa.niffler.db.dao.NifflerUserRepository;
 import guru.qa.niffler.db.model.jpa.Authority;
 import guru.qa.niffler.db.model.jpa.AuthorityEntity;
-import guru.qa.niffler.db.model.jpa.UserDataEntity;
 import guru.qa.niffler.db.model.jpa.UserEntity;
-import guru.qa.niffler.grpc.CurrencyValues;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.jupiter.annotation.Entity;
 import org.junit.jupiter.api.extension.*;
@@ -16,11 +13,9 @@ import java.util.Arrays;
 public class DBUserExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
 
     public static ExtensionContext.Namespace DB_USERS_NAMESPACE = ExtensionContext.Namespace.create(DBUserExtension.class);
-    private static AuthUserDao authUserDao = AuthUserDao.getInstance();
-    private static UserDataDao userDataDao = UserDataDao.getInstance();
+    private static NifflerUserRepository userRepository = new NifflerUserRepository();
 
     private static UserEntity userEntity = new UserEntity();
-    private static UserDataEntity userDataEntity = new UserDataEntity();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -42,19 +37,14 @@ public class DBUserExtension implements ParameterResolver, BeforeEachCallback, A
                                                 return authorityEntity;
                                     })
                                     .toList());
-            userDataEntity.setUsername(dbUser.username());
-            userDataEntity.setCurrency(CurrencyValues.RUB);
-
-            authUserDao.createUser(userEntity);
-            userDataDao.createUserData(userDataEntity);
+            userRepository.createUser(userEntity);
             context.getStore(DB_USERS_NAMESPACE).put(context.getUniqueId(),userEntity);
         }
     }
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
-        userDataDao.deleteUser(userDataEntity);
-        authUserDao.deleteUser(userEntity);
+        userRepository.removeUser(userEntity);
         context.getStore(DB_USERS_NAMESPACE).remove(context.getUniqueId());
     }
 

@@ -23,4 +23,9 @@ public class UserDataDaoHibernate extends JpaService implements UserDataDao {
     public void deleteUser(UserDataEntity user) {
 
     }
+
+    @Override
+    public UserDataEntity getUserDataByUsername(UserDataEntity user) {
+        return null;
+    }
 }
