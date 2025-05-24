@@ -7,7 +7,7 @@ import guru.qa.niffler.db.model.jpa.UserDataEntity;
 
 public interface UserDataDao {
     static UserDataDao getInstance() {
-        String dbImpl = "spring";//System.getProperty("db.impl");
+        String dbImpl = "hibernate";//System.getProperty("db.impl");
         return switch (dbImpl) {
             case "spring" -> new UserDataDaoSpring();
             case "hibernate" -> new UserDataDaoHibernate();

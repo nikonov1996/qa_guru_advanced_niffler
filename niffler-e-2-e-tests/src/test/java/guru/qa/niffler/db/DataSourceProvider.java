@@ -1,5 +1,6 @@
 package guru.qa.niffler.db;
 
+import com.p6spy.engine.spy.P6DataSource;
 import guru.qa.niffler.config.Config;
 import org.postgresql.ds.PGSimpleDataSource;
 
@@ -17,7 +18,7 @@ public enum DataSourceProvider {
 
     private static final Config config = Config.getInstance();
 
-    private final Map<DataSourceDB,PGSimpleDataSource> dbSources = new ConcurrentHashMap<>();
+    private final Map<DataSourceDB,DataSource> dbSources = new ConcurrentHashMap<>();
 
     public DataSource getDataSource(DataSourceDB dataSource) {
         // метод computeIfAbsent возвращает значение из мапы по ключу если оно там есть,
@@ -29,7 +30,8 @@ public enum DataSourceProvider {
             pg.setURL(ds.getDbSource());
             pg.setUser(config.dbUser());
             pg.setPassword(config.dbPassword());
-            return pg;
+            P6DataSource p6ds = new P6DataSource(pg);
+            return p6ds;
         });
     }
 

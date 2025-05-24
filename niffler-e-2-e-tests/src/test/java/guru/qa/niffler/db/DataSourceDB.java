@@ -23,4 +23,8 @@ public enum DataSourceDB {
                 config.dbHost(),
                 config.dbPort());
     }
+
+    public String getP6SpyUrl(){
+        return getDbSource().replace("jdbc:","jdbc:p6spy:");
+    }
 }

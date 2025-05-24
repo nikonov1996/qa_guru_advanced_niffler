@@ -20,7 +20,7 @@ public interface AuthUserDao {
      Следовательно, сам тест ничего не знает о том, с какой базой данных он работает. Это называется слабая связностью
   */
     static AuthUserDao getInstance() {
-        String dbImpl = "spring";//System.getProperty("db.impl");
+        String dbImpl = "hibernate";//System.getProperty("db.impl");
         return switch (dbImpl) {
             case "spring" -> new AuthUserDaoSpring();
             case "hibernate" -> new AuthUserDaoHibernate();

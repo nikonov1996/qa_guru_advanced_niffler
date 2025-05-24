@@ -19,10 +19,10 @@ public enum EntityManagerFactoryProvider {
     public EntityManagerFactory getDataSource(DataSourceDB db){
         return dataSourceStore.computeIfAbsent(db, key ->{
             Map<String, Object> props = new HashMap<>();
-            props.put("hibernate.connection.url",db.getDbSource());
+            props.put("hibernate.connection.url",db.getP6SpyUrl());
             props.put("hibernate.connection.user",cfg.dbUser());
             props.put("hibernate.connection.password",cfg.dbPassword());
-            props.put("hibernate.connection.driver_class","org.postgresql.Driver");
+            props.put("hibernate.connection.driver_class","com.p6spy.engine.spy.P6SpyDriver");
             props.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect");
 
             EntityManagerFactory entityManagerFactory
